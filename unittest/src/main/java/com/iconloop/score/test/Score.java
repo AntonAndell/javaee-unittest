@@ -71,9 +71,8 @@ public class Score extends TestBase {
         sm.pushFrame(from, this.score, readonly, methodName, value);
         try {
             Method method = getMethodByName(methodName);
-            System.out.println(methodName);
-
             Object[] methodParameters = convertParameters(method, params);
+
             return method.invoke(instance, methodParameters);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             e.printStackTrace();
@@ -99,7 +98,6 @@ public class Score extends TestBase {
         int i = 0;
         for (Class<?> parameterClass : parameterTypes) {
             Object param = parsedParams[i];
-
             if (param == null) {
                 parsedParams[i] = convertDefault(parameterClass);
             } else if (isNumeric(parameterClass)) {

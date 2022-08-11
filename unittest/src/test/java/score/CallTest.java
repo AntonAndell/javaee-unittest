@@ -22,13 +22,12 @@ import com.iconloop.score.test.ServiceManager;
 import com.iconloop.score.test.TestBase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
+import score.annotation.External;
+import score.annotation.Optional;
 import scorex.util.ArrayList;
 
 import java.math.BigInteger;
 import java.util.List;
-import score.annotation.External;
-import score.annotation.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -101,7 +100,7 @@ public class CallTest extends TestBase {
 
         @External(readonly=true)
         public String arrayListEcho() {
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             list.add("test1");
             list.add("test2");
             list.add("test3");
@@ -127,14 +126,14 @@ public class CallTest extends TestBase {
     }
 
     @Test
-    void parameterConverions_array() {
+    void parameterConversions_array() {
         String echoMessage = "test1";
         assertEquals(echoMessage, echoScore.call("listEcho"));
         assertEquals(echoMessage, echoScore.call("arrayListEcho"));
     }
 
     @Test
-    void parameterConverions_numeric() {
+    void parameterConversions_numeric() {
         assertEquals(10, echoScore.call("genericEcho", "echoInteger", BigInteger.TEN));
         assertEquals(Short.valueOf("10"), echoScore.call("genericEcho", "echoShort", BigInteger.TEN));
         assertEquals(Long.valueOf("10"), echoScore.call("genericEcho", "echoLong", BigInteger.TEN));
@@ -145,7 +144,7 @@ public class CallTest extends TestBase {
     }
 
     @Test
-    void parameterConverions_Optional() {
+    void parameterConversions_Optional() {
         assertEquals("default", echoScore.call("echoOptional", "first"));
         assertEquals("seconds", echoScore.call("echoOptional", "first", "seconds"));
     }

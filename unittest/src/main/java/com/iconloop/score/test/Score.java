@@ -19,13 +19,12 @@ package com.iconloop.score.test;
 import score.Address;
 import score.UserRevertedException;
 
-import java.util.*;
-import scorex.util.ArrayList;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 public class Score extends TestBase {
     private static final ServiceManager sm = getServiceManager();
@@ -71,10 +70,10 @@ public class Score extends TestBase {
     Object call(Account from, boolean readonly, BigInteger value, String methodName, Object... params) {
         sm.pushFrame(from, this.score, readonly, methodName, value);
         try {
-            Method  method = getMethodByName(methodName);
+            Method method = getMethodByName(methodName);
             System.out.println(methodName);
 
-            Object[] methodParameters = converParameters(method, params);
+            Object[] methodParameters = convertParameters(method, params);
             return method.invoke(instance, methodParameters);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             e.printStackTrace();
@@ -92,13 +91,13 @@ public class Score extends TestBase {
         }
     }
 
-    private Object[] converParameters(Method method, Object[] params) {
-        Class<?>[] parameterTypes =  method.getParameterTypes();
+    private Object[] convertParameters(Method method, Object[] params) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
         int numberOfParams = parameterTypes.length;
         Object[] parsedParams = Arrays.copyOf(params, numberOfParams);
-        
+
         int i = 0;
-        for(Class<?> parameterClass : parameterTypes) {
+        for (Class<?> parameterClass : parameterTypes) {
             Object param = parsedParams[i];
 
             if (param == null) {
@@ -128,15 +127,15 @@ public class Score extends TestBase {
 
     private boolean isNumeric(Class<?> type) {
         return Number.class.isAssignableFrom(type) ||
-        type == Integer.TYPE ||
-        type == Long.TYPE ||
-        type == Short.TYPE;
+                type == Integer.TYPE ||
+                type == Long.TYPE ||
+                type == Short.TYPE;
     }
 
     private Object handleNumeric(Object numericValue, Class<?> targetType) {
         System.out.println(targetType);
         if (targetType == Integer.TYPE) {
-           return Integer.valueOf(numericValue.toString());
+            return Integer.valueOf(numericValue.toString());
         } else if (targetType == Long.TYPE) {
             return Long.valueOf(numericValue.toString());
         } else if (targetType == Short.TYPE) {

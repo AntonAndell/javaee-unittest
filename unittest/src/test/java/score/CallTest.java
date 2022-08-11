@@ -24,8 +24,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import scorex.util.ArrayList;
+
+import java.math.BigInteger;
 import java.util.List;
 import score.annotation.External;
+import score.annotation.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -45,6 +48,36 @@ public class CallTest extends TestBase {
             return messages[0];
         }
 
+
+        @External(readonly=true)
+        public String echoOptional(String first, @Optional String second) {
+            if (second == null) {
+                second = "default";
+            }
+
+            return second;
+        }
+
+        @External(readonly=true)
+        public BigInteger echoBigInteger(BigInteger bigInteger) {
+            return bigInteger;
+        }
+
+        @External(readonly=true)
+        public int echoInteger(int _int) {
+            return _int;
+        }
+
+        @External(readonly=true)
+        public long echoLong(long _long) {
+            return _long;
+        }
+
+        @External(readonly=true)
+        public short echoShort(short _short) {
+            return _short;
+        }
+
         @External(readonly=true)
         public String castedEcho(String message) {
             return (String) Context.call(Context.getAddress(), "echo", message);
@@ -53,6 +86,11 @@ public class CallTest extends TestBase {
         @External(readonly=true)
         public String typedEcho(String message) {
             return Context.call(String.class, Context.getAddress(), "echo", message);
+        }
+
+        @External(readonly=true)
+        public Object genericEcho(String method, Object obj) {
+            return Context.call(Context.getAddress(), method, obj);
         }
 
         @External(readonly=true)
@@ -89,9 +127,26 @@ public class CallTest extends TestBase {
     }
 
     @Test
-    void listEcho() {
+    void parameterConverions_array() {
         String echoMessage = "test1";
         assertEquals(echoMessage, echoScore.call("listEcho"));
         assertEquals(echoMessage, echoScore.call("arrayListEcho"));
+    }
+
+    @Test
+    void parameterConverions_numeric() {
+        assertEquals(10, echoScore.call("genericEcho", "echoInteger", BigInteger.TEN));
+        assertEquals(Short.valueOf("10"), echoScore.call("genericEcho", "echoShort", BigInteger.TEN));
+        assertEquals(Long.valueOf("10"), echoScore.call("genericEcho", "echoLong", BigInteger.TEN));
+        assertEquals(BigInteger.TEN, echoScore.call("genericEcho", "echoBigInteger", 10));
+        assertEquals(BigInteger.TEN, echoScore.call("genericEcho", "echoBigInteger", Long.valueOf("10")));
+        assertEquals(BigInteger.TEN, echoScore.call("genericEcho", "echoBigInteger", Short.valueOf("10")));
+        assertEquals(BigInteger.TEN, echoScore.call("genericEcho", "echoBigInteger", Integer.valueOf("10")));
+    }
+
+    @Test
+    void parameterConverions_Optional() {
+        assertEquals("default", echoScore.call("echoOptional", "first"));
+        assertEquals("seconds", echoScore.call("echoOptional", "first", "seconds"));
     }
 }

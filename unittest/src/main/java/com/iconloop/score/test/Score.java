@@ -101,6 +101,7 @@ public class Score extends TestBase {
             Object param = parsedParams[i];
 
             if (param == null) {
+                parsedParams[i] = convertDefault(parameterClass);
             } else if (isNumeric(parameterClass)) {
                 parsedParams[i] = handleNumeric(param, parameterClass);
             } else if (parameterClass.isArray() && !param.getClass().isArray()) {
@@ -132,8 +133,27 @@ public class Score extends TestBase {
                 type == Short.TYPE;
     }
 
+    private Object convertDefault(Class<?> type) {
+        if (type == Integer.TYPE) {
+            return Integer.valueOf("0");
+        } else if (type == Long.TYPE) {
+            return Long.valueOf("0");
+        } else if (type == Short.TYPE) {
+            return Short.valueOf("0");
+        } else if (type == Character.TYPE) {
+            return Character.MIN_VALUE;
+        } else if (type == Byte.TYPE) {
+            return Byte.valueOf("0");
+        } else if (type == Boolean.TYPE) {
+            return Boolean.FALSE;
+        } else if (type == BigInteger.class) {
+            return BigInteger.ZERO;
+        } else {
+            return null;
+        }
+    }
+
     private Object handleNumeric(Object numericValue, Class<?> targetType) {
-        System.out.println(targetType);
         if (targetType == Integer.TYPE) {
             return Integer.valueOf(numericValue.toString());
         } else if (targetType == Long.TYPE) {

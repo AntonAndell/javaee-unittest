@@ -19,6 +19,10 @@ package com.iconloop.score.test;
 import score.Address;
 import score.UserRevertedException;
 
+import java.util.*;
+import scorex.util.ArrayList;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 
@@ -67,7 +71,9 @@ public class Score extends TestBase {
         sm.pushFrame(from, this.score, readonly, method, value);
         Class<?>[] paramClasses = new Class<?>[params.length];
         for (int i = 0; i < params.length; i++) {
+            params[i] = preProccessParam(params[i]);
             Class<?> type = params[i].getClass();
+    
             // Convert supported object types to primitive data types
             if (type == Integer.class) {
                 paramClasses[i] = Integer.TYPE; // int
@@ -103,5 +109,30 @@ public class Score extends TestBase {
         } finally {
             sm.popFrame();
         }
+    }
+
+    private Object preProccessParam(Object param) {
+        try {
+            Class<?> type = param.getClass();
+            if (type == List.class || 
+                type == ArrayList.class || 
+                type == Class.forName("java.util.ImmutableCollections$ListN")) {
+                List<?> list = (List<?>) param;
+                if (list.size() == 0) {
+                    return param;
+                }
+    
+                Class<?> listType = list.get(0).getClass();
+                Object[] arr = (Object[]) Array.newInstance(listType, list.size());
+                for (int j = 0; j < list.size(); j++) {
+                    arr[j] = list.get(j);   
+                }
+    
+                return arr;
+            }
+        } catch (ClassNotFoundException e) {
+        }
+
+        return param;    
     }
 }
